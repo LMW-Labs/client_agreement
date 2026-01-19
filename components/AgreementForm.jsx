@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export default function AgreementForm() {
   // Generate unique agreement number: FF-YYYYMMDD-HHMMSS
@@ -147,15 +148,42 @@ export default function AgreementForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!signature) {
       alert('Please provide your signature');
       return;
     }
-    
+
     if (!formData.acknowledgment) {
       alert('Please acknowledge the terms and conditions');
       return;
+    }
+
+    // Save to Supabase
+    try {
+      const { error } = await supabase.from('agreements').insert({
+        agreement_number: formData.agreementNumber,
+        agreement_date: formData.agreementDate,
+        client_business_name: formData.clientBusinessName,
+        client_contact_name: formData.clientContactName,
+        client_email: formData.clientEmail,
+        client_phone: formData.clientPhone,
+        client_title: formData.clientTitle,
+        selected_package: formData.selectedPackage,
+        custom_build_fee: formData.customBuildFee ? parseFloat(formData.customBuildFee) : null,
+        custom_build_description: formData.customBuildDescription,
+        selected_rev_share: formData.selectedRevShare,
+        selected_maintenance: formData.selectedMaintenance,
+        total_due_at_signing: calculateTotal(),
+        signature_data: signature
+      });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        // Continue with PDF generation even if save fails
+      }
+    } catch (err) {
+      console.error('Failed to save agreement:', err);
     }
 
     // Generate PDF
