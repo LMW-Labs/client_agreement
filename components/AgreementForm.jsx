@@ -1,7 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 export default function AgreementForm() {
+  // Generate unique agreement number: FF-YYYYMMDD-HHMMSS
+  const generateAgreementNumber = () => {
+    const now = new Date();
+    const date = now.toISOString().split('T')[0].replace(/-/g, '');
+    const time = now.toTimeString().split(' ')[0].replace(/:/g, '');
+    return `FF-${date}-${time}`;
+  };
+
   const [formData, setFormData] = useState({
+    agreementNumber: generateAgreementNumber(),
     agreementDate: new Date().toISOString().split('T')[0],
     clientBusinessName: '',
     clientContactName: '',
@@ -172,6 +181,8 @@ export default function AgreementForm() {
     
     doc.setTextColor(0);
     doc.setFontSize(10);
+    doc.text(`Agreement #: ${formData.agreementNumber}`, margin, y);
+    y += 6;
     doc.text(`Agreement Date: ${formData.agreementDate}`, margin, y);
     y += 12;
     
@@ -337,6 +348,7 @@ export default function AgreementForm() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Website Services Agreement</h1>
           <p className="text-blue-200">FaithFeed LLC</p>
+          <p className="text-blue-300 text-sm mt-2">Agreement #: {formData.agreementNumber}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl overflow-hidden">
