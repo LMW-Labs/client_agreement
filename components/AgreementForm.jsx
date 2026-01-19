@@ -9,6 +9,7 @@ export default function AgreementForm() {
     clientPhone: '',
     selectedPackage: '',
     customBuildFee: '',
+    customBuildDescription: '',
     selectedRevShare: 'standard',
     selectedMaintenance: '',
     summaryBuild: '',
@@ -205,6 +206,17 @@ export default function AgreementForm() {
     const selectedPkg = packages.find(p => p.value === formData.selectedPackage);
     doc.text(`Website Package: ${selectedPkg?.label || 'Custom'} ${formData.customBuildFee ? `($${formData.customBuildFee})` : ''}`, margin, y);
     y += 6;
+
+    if (formData.customBuildDescription) {
+      doc.setFont('helvetica', 'italic');
+      const descLines = doc.splitTextToSize(`Services: ${formData.customBuildDescription}`, 170);
+      descLines.forEach(line => {
+        doc.text(line, margin, y);
+        y += 5;
+      });
+      doc.setFont('helvetica', 'normal');
+      y += 2;
+    }
     
     const selectedRev = revShareOptions.find(r => r.value === formData.selectedRevShare);
     doc.text(`Revenue Share: ${selectedRev?.label} (${selectedRev?.desc})`, margin, y);
@@ -424,6 +436,17 @@ export default function AgreementForm() {
                 onChange={handleInputChange}
                 placeholder="Enter custom amount"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description of Services</label>
+              <textarea
+                name="customBuildDescription"
+                value={formData.customBuildDescription}
+                onChange={handleInputChange}
+                placeholder="Describe the custom services included in this build..."
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
           </div>
